@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PaymentsDb": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Data Source=localhost;Initial Catalog=Payments;User Id=Payments;Password=Go0d2Use#\""
+    }
+  }
+}
