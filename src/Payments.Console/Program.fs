@@ -21,9 +21,15 @@ let invoices =
 // Debugging, let's see what we retrieved
 // invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
 
+type ValidationErrors = 
+    | MissingAccountName
+    | MissingBsb
+    | MissingAccountNumber
+    | InvalidAmount of amount : decimal
+
 type FailureResult<'TResult> = {
     Result : 'TResult
-    Errors : string list
+    Errors : ValidationErrors list
 }
 
 let (&&&) v1 v2 =
@@ -34,22 +40,29 @@ let (&&&) v1 v2 =
 let validateAccountName payableInvoice =
     match payableInvoice.AccountName with
     | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = ["Account name is required."]}
+    | None _ -> Error { Result = payableInvoice; Errors = [MissingAccountName]}
 
 let validateAccountBsb payableInvoice =
     match payableInvoice.AccountBsb with
     | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = ["BSB is required."]}
+    | None _ -> Error { Result = payableInvoice; Errors = [MissingBsb]}
 
 let validateAccountNumber payableInvoice =
     match payableInvoice.AccountNumber with
     | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = ["Account number is required."]}
+    | None _ -> Error { Result = payableInvoice; Errors = [MissingAccountNumber]}
+
+let validateAmount payableInvoice = 
+    if payableInvoice.Amount <= 0 then 
+        Error { Result = payableInvoice; Errors = [InvalidAmount payableInvoice.Amount]}
+    else
+        Ok payableInvoice
 
 let validatePayableInvoice =
     validateAccountName
     &&& validateAccountBsb
     &&& validateAccountNumber
+    &&& validateAmount
 
 let validatedInput = invoices |> Seq.map validatePayableInvoice
 
