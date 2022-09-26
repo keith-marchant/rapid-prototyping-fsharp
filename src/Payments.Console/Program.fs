@@ -1,32 +1,11 @@
 ﻿open FSharp.Data.Sql
-open System
+open RoP
+open PayableInvoice
+open Type1Writer
 
 let [<Literal>] connectionString = "Data Source=localhost;Initial Catalog=Payments;User Id=Payments;Password=Go0d2Use#"
 
 type sql = SqlDataProvider<Common.DatabaseProviderTypes.MSSQLSERVER, connectionString, UseOptionTypes = Common.NullableColumnType.OPTION>
-
-type PayableInvoice = {
-    InvoiceId : int
-    InvoiceReference : string
-    Amount : decimal
-    DueDate : DateTime
-    ContactId : int
-    AccountName : string option
-    AccountBsb : string option
-    AccountNumber : string option
-}
-
-let createPayableInvoice (invoiceId, invoiceReference, amount, dueDate, contactId, accountName, accountBsb, accountNumber) = 
-    {
-        InvoiceId = invoiceId
-        InvoiceReference = invoiceReference
-        Amount = amount
-        DueDate = dueDate
-        ContactId = contactId
-        AccountName = accountName
-        AccountBsb = accountBsb
-        AccountNumber = accountNumber
-    }
 
 let ctx = sql.GetDataContext()
 
@@ -39,25 +18,45 @@ let invoices =
     } 
     |> Seq.map createPayableInvoice
 
+// Debugging, let's see what we retrieved
 invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
 
+type FailureResult<'TResult> = {
+    Result : 'TResult
+    Errors : string list
+}
 
+let (&&&) v1 v2 =
+    let addSuccess r1 r2 = r1 // return first
+    let addFailure f1 f2 = { Result = f1.Result; Errors = (List.append f1.Errors f2.Errors) } // Combine errors
+    plus addSuccess addFailure v1 v2
 
+let validateAccountName payableInvoice =
+    match payableInvoice.AccountName with
+    | Some x -> Success payableInvoice
+    | None _ -> Failure { Result = payableInvoice; Errors = ["Account name is required."]}
 
+let validateAccountBsb payableInvoice =
+    match payableInvoice.AccountBsb with
+    | Some x -> Success payableInvoice
+    | None _ -> Failure { Result = payableInvoice; Errors = ["BSB is required."]}
 
+let validateAccountNumber payableInvoice =
+    match payableInvoice.AccountNumber with
+    | Some x -> Success payableInvoice
+    | None _ -> Failure { Result = payableInvoice; Errors = ["Account number is required."]}
 
-type ValidatedResult<'TValidated, 'TMessage> = 
-    | Success of 'TValidated
-    | Failure of 'TValidated * 'TMessage list
+let validatePayableInvoice =
+    validateAccountName
+    &&& validateAccountBsb
+    &&& validateAccountNumber
 
-let validatedResult = Success "This was success"
+let validatedInput = invoices |> Seq.map validatePayableInvoice
 
-let failedValidation = Failure (1, [ "message1"])
+let printType1Content validatedRecord = 
+    printfn "%s" (writeType1LineContent validatedRecord)
 
-let printValidation result = match result with
-                                | Success x -> printfn "%A " x
-                                | Failure (x,y) -> printfn "%A %A" x y
+let printValidationFailure failure =
+    printfn "Invoice Id: %d, Error: %A" failure.Result.InvoiceId failure.Errors
 
-printValidation validatedResult
-
-printValidation failedValidation
+validatedInput |> Seq.iter (fun x -> either printType1Content printValidationFailure x)
