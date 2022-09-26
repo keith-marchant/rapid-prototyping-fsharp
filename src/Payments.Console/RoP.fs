@@ -1,4 +1,6 @@
-﻿module RoP
+﻿// Borrowed from https://fsharpforfunandprofit.com/posts/recipe-part2/
+
+module RoP
 
     // the two-track type
     type Result<'TSuccess,'TFailure> =
