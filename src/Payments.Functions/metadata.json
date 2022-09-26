@@ -1,15 +1,15 @@
 {
-    "defaultFunctionName": "CreatePaymentsFile",
-    "description": "$HttpTrigger_description",
-    "name": "HTTP trigger",
+    "defaultFunctionName": "CreateEftFile",
+    "description": "$TimerTrigger_description",
+    "name": "Timer trigger",
     "language": "F#",
     "category": [
         "$temp_category_core",
-        "$temp_category_api"
+        "$temp_category_dataProcessing"
     ],
-    "categoryStyle": "http",
+    "categoryStyle": "timer",
     "enabledInTryMode": true,
     "userPrompt": [
-        "authLevel"
+        "schedule"
     ]
 }

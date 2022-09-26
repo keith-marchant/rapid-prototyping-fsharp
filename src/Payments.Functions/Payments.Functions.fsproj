@@ -4,11 +4,13 @@
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CreatePaymentsFile.fs" />
+    <Compile Include="CreateEftFile.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="function.json" />
     <Content Include="host.json" />
     <Content Include="local.settings.json" />
+    <Content Include="metadata.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.md" />
