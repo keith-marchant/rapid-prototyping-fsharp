@@ -11,9 +11,9 @@ type PayableInvoice = {
     Amount : decimal
     DueDate : DateTime
     ContactId : int
-    AccountName : Option<string>
-    AccountBsb : Option<string>
-    AccountNumber : Option<string>
+    AccountName : string option
+    AccountBsb : string option
+    AccountNumber : string option
 }
 
 let createPayableInvoice (invoiceId, invoiceReference, amount, dueDate, contactId, accountName, accountBsb, accountNumber) = 
@@ -28,8 +28,6 @@ let createPayableInvoice (invoiceId, invoiceReference, amount, dueDate, contactI
         AccountNumber = accountNumber
     }
 
-
-
 let ctx = sql.GetDataContext()
 
 let invoices = 
@@ -41,7 +39,7 @@ let invoices =
     } 
     |> Seq.map createPayableInvoice
 
-invoices |> Seq.iter (fun x -> printf "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
+invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
 
 
 
@@ -63,6 +61,3 @@ let printValidation result = match result with
 printValidation validatedResult
 
 printValidation failedValidation
-
-
-
