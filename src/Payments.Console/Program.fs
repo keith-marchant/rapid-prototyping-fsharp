@@ -28,9 +28,7 @@ let createPayableInvoice (invoiceId, invoiceReference, amount, dueDate, contactI
         AccountNumber = accountNumber
     }
 
-type ValidatedResult<'TValidated, 'TMessage> = 
-    | Success of 'TValidated
-    | Failure of 'TValidated * 'TMessage list
+
 
 let ctx = sql.GetDataContext()
 
@@ -43,6 +41,28 @@ let invoices =
     } 
     |> Seq.map createPayableInvoice
 
-let validatedList = Seq.map 
+invoices |> Seq.iter (fun x -> printf "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
+
+
+
+
+
+
+type ValidatedResult<'TValidated, 'TMessage> = 
+    | Success of 'TValidated
+    | Failure of 'TValidated * 'TMessage list
+
+let validatedResult = Success "This was success"
+
+let failedValidation = Failure (1, [ "message1"])
+
+let printValidation result = match result with
+                                | Success x -> printfn "%A " x
+                                | Failure (x,y) -> printfn "%A %A" x y
+
+printValidation validatedResult
+
+printValidation failedValidation
+
 
 
