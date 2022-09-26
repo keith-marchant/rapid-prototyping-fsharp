@@ -19,7 +19,7 @@ let invoices =
     |> Seq.map createPayableInvoice
 
 // Debugging, let's see what we retrieved
-invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
+// invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
 
 type FailureResult<'TResult> = {
     Result : 'TResult
@@ -33,18 +33,18 @@ let (&&&) v1 v2 =
 
 let validateAccountName payableInvoice =
     match payableInvoice.AccountName with
-    | Some x -> Success payableInvoice
-    | None _ -> Failure { Result = payableInvoice; Errors = ["Account name is required."]}
+    | Some x -> Ok payableInvoice
+    | None _ -> Error { Result = payableInvoice; Errors = ["Account name is required."]}
 
 let validateAccountBsb payableInvoice =
     match payableInvoice.AccountBsb with
-    | Some x -> Success payableInvoice
-    | None _ -> Failure { Result = payableInvoice; Errors = ["BSB is required."]}
+    | Some x -> Ok payableInvoice
+    | None _ -> Error { Result = payableInvoice; Errors = ["BSB is required."]}
 
 let validateAccountNumber payableInvoice =
     match payableInvoice.AccountNumber with
-    | Some x -> Success payableInvoice
-    | None _ -> Failure { Result = payableInvoice; Errors = ["Account number is required."]}
+    | Some x -> Ok payableInvoice
+    | None _ -> Error { Result = payableInvoice; Errors = ["Account number is required."]}
 
 let validatePayableInvoice =
     validateAccountName
