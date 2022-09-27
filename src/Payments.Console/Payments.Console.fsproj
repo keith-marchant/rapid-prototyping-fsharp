@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="RoP.fs" />
     <Compile Include="PayableInvoice.fs" />
     <Compile Include="Type1Writer.fs" />
-    <Compile Include="RoP.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

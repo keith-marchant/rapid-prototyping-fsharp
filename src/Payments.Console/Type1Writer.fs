@@ -1,4 +1,4 @@
-﻿module Type1Writer
+module Type1Writer
 
 open PayableInvoice
 open System

@@ -1,4 +1,4 @@
-﻿// Borrowed from https://fsharpforfunandprofit.com/posts/recipe-part2/
+// Borrowed from https://fsharpforfunandprofit.com/posts/recipe-part2/
 
 module RoP
 

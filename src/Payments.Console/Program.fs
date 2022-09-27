@@ -1,4 +1,4 @@
-﻿open FSharp.Data.Sql
+open FSharp.Data.Sql
 open RoP
 open PayableInvoice
 open Type1Writer
@@ -20,49 +20,6 @@ let invoices =
 
 // Debugging, let's see what we retrieved
 // invoices |> Seq.iter (fun x -> printfn "Record %i, reference %s" x.InvoiceId x.InvoiceReference) |> ignore
-
-type ValidationErrors = 
-    | MissingAccountName
-    | MissingBsb
-    | MissingAccountNumber
-    | InvalidAmount of amount : decimal
-
-type FailureResult<'TResult> = {
-    Result : 'TResult
-    Errors : ValidationErrors list
-}
-
-let (&&&) v1 v2 =
-    let addSuccess r1 r2 = r1 // return first
-    let addFailure f1 f2 = { Result = f1.Result; Errors = (List.append f1.Errors f2.Errors) } // Combine errors
-    plus addSuccess addFailure v1 v2
-
-let validateAccountName payableInvoice =
-    match payableInvoice.AccountName with
-    | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = [MissingAccountName]}
-
-let validateAccountBsb payableInvoice =
-    match payableInvoice.AccountBsb with
-    | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = [MissingBsb]}
-
-let validateAccountNumber payableInvoice =
-    match payableInvoice.AccountNumber with
-    | Some x -> Ok payableInvoice
-    | None _ -> Error { Result = payableInvoice; Errors = [MissingAccountNumber]}
-
-let validateAmount payableInvoice = 
-    if payableInvoice.Amount <= 0 then 
-        Error { Result = payableInvoice; Errors = [InvalidAmount payableInvoice.Amount]}
-    else
-        Ok payableInvoice
-
-let validatePayableInvoice =
-    validateAccountName
-    &&& validateAccountBsb
-    &&& validateAccountNumber
-    &&& validateAmount
 
 let validatedInput = invoices |> Seq.map validatePayableInvoice
 
